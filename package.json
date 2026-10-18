@@ -1,0 +1,13 @@
+{
+  "name": "pudl-splash",
+  "version": "0.1.0",
+  "description": "Classic arcade games as PUDL applet packages.",
+  "license": "Apache-2.0",
+  "author": "Paul Parks",
+  "repository": "github:paulmooreparks/PUDLSplash",
+  "files": ["dist", "README.md", "LICENSE"],
+  "scripts": {
+    "pack": "node tools/pack.js packages dist",
+    "test": "node tools/test-invaders.js"
+  }
+}
