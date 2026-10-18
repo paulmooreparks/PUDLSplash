@@ -7,9 +7,9 @@ PUDLSplash is a collection of classic arcade games, each a [PUDL applet package]
 | Package | Game |
 |---|---|
 | `packages/invaders` | Space Invaders (1978) |
-| `packages/asteroids` | Asteroids (1979), to come |
+| `packages/asteroids` | Asteroids (1979) |
 
-They share `packages/shared/splash-input.js`, the keys and the touch pad, and `packages/shared/splash-scores.js`, the scores file, `~/.splash/scores.json`.
+They share `packages/shared`: the shell (the canvas, the bar, the dialogs, the scores, the sound and the loop), the keys and the touch pad, the pixel font and the scores file, `~/.splash/scores.json`, all bundled in front of each game's script when the collection is packed.
 
 ## Installing
 
@@ -26,3 +26,5 @@ Space Invaders: arrows or A and D move, Space or X fires, P or Escape pauses, En
 ## Licence
 
 Apache License 2.0; see `LICENSE`.
+
+Asteroids: arrows or A and D turn, the up arrow or W thrusts, Space or X fires, the down arrow, S, Z or Shift is hyperspace, P or Escape pauses, Enter starts. Rocks break in two until they are dust; the big saucer is worth 200 and the small one, which aims, 1,000; a new ship every 10,000 points.
