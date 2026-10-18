@@ -413,12 +413,13 @@
             if (mode === 'dying') { ctx.drawImage(image(PLAYER_BOOM[Math.floor(timer / 150) % 2], colours.danger), Math.round(player.x), PLAYER_Y + 1); }
             else if (mode !== 'ready' && mode !== 'over') { ctx.drawImage(image(PLAYER, colours.accent), Math.round(player.x), PLAYER_Y); }
             if (mode === 'ready') {
-                text('SPACE INVADERS', W / 2, 100, colours.fg, 2, 'center');
-                text('ENTER OR NEW GAME TO PLAY', W / 2, 124, colours.muted, 1, 'center');
-                ctx.drawImage(image(SQUID[0], colours.fg), 76, 148); text('= 30 POINTS', 96, 148, colours.muted);
-                ctx.drawImage(image(CRAB[0], colours.fg), 74, 164); text('= 20 POINTS', 96, 164, colours.muted);
-                ctx.drawImage(image(OCTOPUS[0], colours.fg), 74, 180); text('= 10 POINTS', 96, 180, colours.muted);
-                ctx.drawImage(image(UFO, colours.warn), 72, 196); text('= ? MYSTERY', 96, 196, colours.muted);
+                /* The title and the table end above the shields at 184. */
+                text('SPACE INVADERS', W / 2, 52, colours.fg, 2, 'center');
+                text('ENTER OR NEW GAME TO PLAY', W / 2, 76, colours.muted, 1, 'center');
+                ctx.drawImage(image(SQUID[0], colours.fg), 76, 100); text('= 30 POINTS', 96, 100, colours.muted);
+                ctx.drawImage(image(CRAB[0], colours.fg), 74, 116); text('= 20 POINTS', 96, 116, colours.muted);
+                ctx.drawImage(image(OCTOPUS[0], colours.fg), 74, 132); text('= 10 POINTS', 96, 132, colours.muted);
+                ctx.drawImage(image(UFO, colours.warn), 72, 148); text('= ? MYSTERY', 96, 148, colours.muted);
             } else if (mode === 'paused') {
                 text('PAUSED', W / 2, 116, colours.fg, 2, 'center');
             } else if (mode === 'over') {
