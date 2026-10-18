@@ -23,8 +23,8 @@ builds `dist/`, with the games and `shared/` beside them, using the packing tool
 
 Space Invaders: arrows or A and D move, Space or X fires, P or Escape pauses, Enter starts. Each wave starts lower and marches faster as its numbers fall; a saucer now and then is worth 50 to 300; a fourth cannon comes at 1,500 points.
 
+Asteroids: arrows or A and D turn, the up arrow or W thrusts, Space or X fires, the down arrow, S, Z or Shift is hyperspace, P or Escape pauses, Enter starts. Rocks break in two until they are dust; the big saucer is worth 200 and the small one, which aims, 1,000; a new ship every 10,000 points.
+
 ## Licence
 
 Apache License 2.0; see `LICENSE`.
-
-Asteroids: arrows or A and D turn, the up arrow or W thrusts, Space or X fires, the down arrow, S, Z or Shift is hyperspace, P or Escape pauses, Enter starts. Rocks break in two until they are dust; the big saucer is worth 200 and the small one, which aims, 1,000; a new ship every 10,000 points.
