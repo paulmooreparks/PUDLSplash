@@ -17,7 +17,7 @@ They share `packages/shared`: the shell (the canvas, the bar, the dialogs, the s
 node tools/pack.js packages dist
 ```
 
-builds `dist/`, with the games and `shared/` beside them, using the packing tool from `pudl-applet-packages` (copied into `tools/`). A host copies `dist/` into its `wwwroot/applets/`; on parkscomputing.com the games are then at `/page/invaders` and in the Applets menu.
+builds `dist/`, with the games and `shared/` beside them, using the packing tool from `pudl-applet-packages` (copied into `tools/`). A host copies `dist/` into its `wwwroot/applets/`; on a host whose applet pages are under `/page/`, the games are then at `/page/invaders` and in the Applets menu.
 
 ## Playing
 
