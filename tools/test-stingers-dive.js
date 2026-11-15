@@ -57,5 +57,66 @@ log('every dive comes within reach of the ship', !bad.missed.length, bad.missed.
 log('every dive leaves by the bottom of the screen', !bad.exit.length, bad.exit.length + ' of ' + dives + ', as ' + bad.exit.slice(0, 4).join('; '));
 log('every dive is over within four seconds', !bad.slow.length, bad.slow.length + ' of ' + dives + ', the longest ' + longest + ' ms');
 console.log(dives + ' dives, the longest ' + longest + ' ms');
+
+/* A queen going to set a snare flies from every place in her rank to
+   every place she can stop, and arrives there without circling a point
+   or crossing a side. */
+const snare = { circled: [], side: [], short: [] };
+let snares = 0;
+for (const level of [1, 13, 40]) {
+    const speed = G.diveSpeed(level), y = G.rows[0];
+    for (let x = 15; x <= W - 15; x += 2) {
+        for (let over = 30; over <= W - 30; over += 4) {
+            const e = { x, y, ang: -Math.PI / 2, path: G.snarePath(x, y, over), wp: 0, wpT: 0 };
+            const what = 'level ' + level + ' from ' + x + ' to ' + over;
+            let t = 0, done = false, low = x, high = x, circled = false;
+            while (!done && t < 20000) {
+                const leg = e.wp, waited = e.wpT;
+                done = G.follow(e, speed, speed / G.turn, 16);
+                t += 16;
+                if (e.wp !== leg && waited + 16 > G.giveUp) { circled = true; }
+                low = Math.min(low, e.x); high = Math.max(high, e.x);
+            }
+            snares++;
+            if (circled) { snare.circled.push(what); }
+            if (low < 0 || high > W) { snare.side.push(what + ' spans ' + low.toFixed(0) + ' to ' + high.toFixed(0)); }
+            if (Math.hypot(e.x - over, e.y - G.hoverY) > 17) { snare.short.push(what + ' ends at ' + e.x.toFixed(0) + ',' + e.y.toFixed(0)); }
+        }
+    }
+}
+log('every queen reaches the place where she sets her snare', !snare.circled.length && !snare.short.length, snare.circled.concat(snare.short).slice(0, 4).join('; '));
+log('and stays between the sides of the screen on her way', !snare.side.length, snare.side.length + ' of ' + snares + ', as ' + snare.side.slice(0, 4).join('; '));
+
+/* The ways across the screen in a bonus wave, from the left and from
+   the right, at the speed of the first bonus wave and of the fastest:
+   each is flown through every point, is on the screen for a while, stays
+   above the ship, and ends off the screen. */
+const across = { circled: [], low: [], seen: [], exit: [], slow: [] };
+for (const level of [G.bonusEvery, 40]) {
+    const speed = G.flySpeed(level);
+    for (let n = 0; n < G.passes; n++) {
+        for (const s of [1, -1]) {
+            const p = G.pass(n, s), e = { x: p.x, y: p.y, ang: p.ang, path: p.path, wp: 0, wpT: 0 };
+            const what = 'level ' + level + ' way ' + n + (s > 0 ? ' from the left' : ' from the right');
+            let t = 0, done = false, seen = 0, deepest = 0, circled = false;
+            while (!done && t < 30000) {
+                const leg = e.wp, waited = e.wpT;
+                done = G.follow(e, speed, speed / G.flyTurn, 16);
+                t += 16;
+                if (e.wp !== leg && waited + 16 > G.giveUp) { circled = true; }
+                if (e.x > 8 && e.x < W - 8 && e.y > 16) { seen += 16; deepest = Math.max(deepest, e.y); }
+            }
+            if (circled) { across.circled.push(what); }
+            if (deepest > G.shipY - 20) { across.low.push(what + ' comes down to ' + deepest.toFixed(0)); }
+            if (seen < 1500) { across.seen.push(what + ' is seen for ' + seen + ' ms'); }
+            if (e.x > -4 && e.x < W + 4 && e.y > -4) { across.exit.push(what + ' ends at ' + e.x.toFixed(0) + ',' + e.y.toFixed(0)); }
+            if (t > 7000) { across.slow.push(what + ' takes ' + t + ' ms'); }
+        }
+    }
+}
+log('every way across in a bonus wave is flown through each of its points', !across.circled.length, across.circled.join('; '));
+log('and stays above the ship', !across.low.length, across.low.join('; '));
+log('and is on the screen for a second and a half or more', !across.seen.length, across.seen.join('; '));
+log('and ends off the screen within seven seconds', !across.exit.length && !across.slow.length, across.exit.concat(across.slow).join('; '));
 console.log(failures ? failures + ' check(s) failed' : 'all checks passed');
 process.exit(failures ? 1 : 0);

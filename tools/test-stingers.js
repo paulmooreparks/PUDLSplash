@@ -58,7 +58,7 @@ function log(name, ok, detail) { console.log((ok ? 'PASS ' : 'FAIL ') + name + (
   log('P pauses', (await state()) === 'paused' && (await page.textContent('[data-action="pause"]')) === 'Resume', await state());
   await page.click('[data-action="help"]');
   await page.waitForSelector('[data-role="help-dialog"][open]');
-  log('Help explains the game', /queen/.test(await page.textContent('[data-role="help-dialog"]')) && /honey/.test(await page.textContent('[data-role="help-dialog"]')));
+  log('Help explains the game', /queen/.test(await page.textContent('[data-role="help-dialog"]')) && /snare/.test(await page.textContent('[data-role="help-dialog"]')) && /bonus wave/.test(await page.textContent('[data-role="help-dialog"]')));
   await page.keyboard.press('KeyP');
   log('the keys do not reach the game while Help is open', (await state()) === 'paused', await state());
   await page.click('[data-action="close-help"]');
