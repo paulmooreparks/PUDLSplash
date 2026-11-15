@@ -2,96 +2,22 @@
 
      node tools/test-stingers-play.js
 
-   The game is run against a stand-in for the shell, frame by frame, with
-   the random numbers fixed, and looked at through window.splash.stingers
-   .game(). Wasps dive in groups and come back above their places; a queen
+   The game is run against a stand-in for the shell (stand-in.js), frame
+   by frame, with the random numbers fixed, and looked at through
+   window.splash.stingers.game(). Wasps dive in groups and come back above their places; a queen
    sets a snare, the ship under it is taken, shooting her frees it, and
    the two ships fire and are hit as twins; a shot can lose the taken
    ship; no snare is set over the last ship; a bonus wave has no shooting
    and no diving and ends with a count; and the game counts its shots. */
 'use strict';
-const fs = require('fs');
-const path = require('path');
-const vm = require('vm');
+const t = require('./stand-in')('stingers');
+const { random, drawn, texts, said, held, start, frame, run } = t, g = t.g, s = t.s;
+const G = t.splash.stingers, W = G.width, H = G.height;
+const view = () => G.game();
 
 let failures = 0;
 function log(name, ok, detail) { console.log((ok ? 'PASS ' : 'FAIL ') + name + (ok ? '' : '  ' + String(detail === undefined ? '' : detail).slice(0, 400))); if (!ok) { failures++; } }
 
-/* Random numbers: the ones queued, then always the same one. */
-const random = { queue: [], rest: 0 };
-const M = Object.create(Math);
-M.random = () => (random.queue.length ? random.queue.shift() : random.rest);
-
-/* The stand-in for the shell: its state, the helpers a game calls, and a
-   frame stepped as ../packages/shared/splash-shell.js steps one. */
-const drawn = [], texts = [], said = [];
-let g = null, s = null;
-const window = {
-    pudlApplets: { register(name, applet) { window.applet = applet; } },
-    splash: {
-        shell(root, opts, game) {
-            g = game;
-            s = {
-                mode: 'ready', score: 0, hi: 0, lives: 3, level: 1, timer: 0, extraGiven: 0, root,
-                colours: { bg: 'bg', fg: 'fg', accent: 'accent', positive: 'positive', danger: 'danger', warn: 'warn', muted: 'muted' },
-                ctx: { fillStyle: '', fillRect() { }, drawImage(img, x, y) { drawn.push({ id: img.id, colour: img.colour, x, y }); } }
-            };
-            return {
-                state: s, instance: {},
-                say(t) { said.push(t); },
-                addScore(n) {
-                    s.score += n;
-                    const every = g.extraLifeEvery || 0;
-                    if (every && Math.floor(s.score / every) > s.extraGiven) { s.extraGiven = Math.floor(s.score / every); s.lives++; }
-                },
-                die(ms) { s.mode = 'dying'; s.timer = ms; },
-                cleared(ms) { s.mode = 'cleared'; s.timer = ms; },
-                beep() { },
-                image(spr, colour) { return { id: spr.id, colour }; },
-                text(str) { texts.push(String(str).toUpperCase()); },
-                draw() { drawn.length = 0; texts.length = 0; g.draw(s.ctx); }
-            };
-        }
-    }
-};
-vm.runInNewContext(fs.readFileSync(path.join(__dirname, '..', 'packages', 'stingers', 'stingers.js'), 'utf8'), { window, Math: M });
-const G = window.splash.stingers, W = G.width, H = G.height;
-window.applet.init({}, {});
-const view = () => G.game();
-
-const held = { left: false, right: false, fire: false };
-function start(level) {
-    s.score = 0; s.lives = 3; s.level = level; s.extraGiven = 0; said.length = 0;
-    g.newGame(level);
-    s.mode = 'playing';
-}
-function frame() {
-    const dt = 16;
-    if (s.mode === 'dying') {
-        s.timer -= dt;
-        if (s.timer <= 0) {
-            s.lives--;
-            if (s.lives <= 0) { s.mode = 'over'; }
-            else { g.respawn(); s.mode = 'playing'; }
-        }
-    } else if (s.mode === 'cleared') {
-        s.timer -= dt;
-        if (s.timer <= 0) { s.level++; g.newWave(s.level); s.mode = 'playing'; }
-    } else if (s.mode === 'playing') { g.update(dt, held); }
-    g.after(dt);
-    drawn.length = 0; texts.length = 0;
-    g.draw(s.ctx);
-}
-/* Frames until done() says so or ms have gone by; each() runs before
-   every frame. Says whether done() said so. */
-function run(ms, done, each) {
-    for (let t = 0; t < ms; t += 16) {
-        if (each) { each(); }
-        frame();
-        if (done && done()) { return true; }
-    }
-    return false;
-}
 /* Takes the danger out of the wasps, for a check of something else:
    every diver has already passed the bottom, and no shot of theirs is
    in the air. */
@@ -110,6 +36,25 @@ function shootDown(e, each) {
         v.player.x = Math.max(6, Math.min(W - 6 - (v.twin ? 27 : 13), e.x - 6));
         if (!v.shots.length && s.mode === 'playing') { g.press('fire'); }
     });
+}
+
+/* --- Waves that differ ------------------------------------------------ */
+random.rest = 0;
+const nests = [];
+for (let level = 1; nests.length < 16; level++) { if (level % G.bonusEvery) { nests.push(level); } }
+const text = v => JSON.stringify(v);
+log('each wave flies in by another plan than the one before', nests.slice(1).every((l, i) => text(G.plan(l)) !== text(G.plan(nests[i]))));
+log('and settles into another shape', nests.slice(1).every((l, i) => text(G.shape(l)) !== text(G.shape(nests[i]))));
+log('every plan and every shape comes round, in every pairing',
+    new Set(nests.map(l => text(G.plan(l)))).size === G.plans && new Set(nests.map(l => text(G.shape(l)))).size === G.shapes &&
+    new Set(nests.map(l => text([G.plan(l), G.shape(l)]))).size === G.plans * G.shapes, G.plans + ' plans, ' + G.shapes + ' shapes');
+const bonuses = [1, 2, 3, 4].map(n => n * G.bonusEvery);
+log('the bonus waves differ too', G.swarms >= 3 && new Set(bonuses.map(l => text(G.swarm(l)))).size === G.swarms && text(G.swarm(bonuses[0])) === text(G.swarm(bonuses[G.swarms])));
+for (const level of nests.slice(0, G.plans)) {
+    start(level);
+    const settled = run(40000, () => view().enemies.every(e => e.state === 'form'), harmless);
+    const counts = G.rows.map(y => view().enemies.filter(e => e.sy === y).length);
+    log('wave ' + level + ': all thirty-six fly in and take their places', settled && view().enemies.length === 36 && text(counts) === text(G.shape(level)), text(counts) + ', ' + view().enemies.filter(e => e.state !== 'form').length + ' not in place');
 }
 
 /* --- Groups, and the way back ---------------------------------------- */

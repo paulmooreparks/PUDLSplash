@@ -114,6 +114,32 @@ for (const level of [G.bonusEvery, 40]) {
         }
     }
 }
+/* The ways into the ranks, from the left and from the right, at the
+   speed of the first wave and of the fastest: each is flown through
+   every point and ends on the screen, above the ship, for the wasp to
+   make for its place from there. */
+const inward = { circled: [], end: [], slow: [] };
+for (const level of [1, 40]) {
+    const speed = G.flySpeed(level);
+    for (let n = 0; n < G.ways; n++) {
+        for (const s of [1, -1]) {
+            const p = G.way(n, s), e = { x: p.x, y: p.y, ang: p.ang, path: p.path, wp: 0, wpT: 0 };
+            const what = 'level ' + level + ' way in ' + n + (s > 0 ? ' from the left' : ' from the right');
+            let t = 0, done = false, circled = false;
+            while (!done && t < 30000) {
+                const leg = e.wp, waited = e.wpT;
+                done = G.follow(e, speed, speed / G.flyTurn, 16);
+                t += 16;
+                if (e.wp !== leg && waited + 16 > G.giveUp) { circled = true; }
+            }
+            if (circled) { inward.circled.push(what); }
+            if (e.x < 12 || e.x > W - 12 || e.y < 40 || e.y > G.shipY - 30) { inward.end.push(what + ' ends at ' + e.x.toFixed(0) + ',' + e.y.toFixed(0)); }
+            if (t > 6000) { inward.slow.push(what + ' takes ' + t + ' ms'); }
+        }
+    }
+}
+log('every way into the ranks is flown through each of its points', G.ways >= 5 && !inward.circled.length, inward.circled.join('; '));
+log('and ends on the screen above the ship within six seconds', !inward.end.length && !inward.slow.length, inward.end.concat(inward.slow).join('; '));
 log('every way across in a bonus wave is flown through each of its points', !across.circled.length, across.circled.join('; '));
 log('and stays above the ship', !across.low.length, across.low.join('; '));
 log('and is on the screen for a second and a half or more', !across.seen.length, across.seen.join('; '));
