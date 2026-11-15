@@ -8,6 +8,6 @@
   "files": ["dist", "README.md", "LICENSE"],
   "scripts": {
     "pack": "node tools/pack.js packages dist",
-    "test": "node tools/test-invaders.js && node tools/test-asteroids.js"
+    "test": "node tools/test-pantry-maze.js && node tools/test-invaders.js && node tools/test-asteroids.js && node tools/test-pantry.js && node tools/test-stingers.js"
   }
 }

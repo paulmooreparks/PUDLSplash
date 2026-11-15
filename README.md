@@ -8,6 +8,8 @@ PUDLSplash is a collection of classic arcade games, each a [PUDL applet package]
 |---|---|
 | `packages/invaders` | Space Invaders (1978) |
 | `packages/asteroids` | Asteroids (1979) |
+| `packages/pantry` | Pantry Raid, a maze chase of the collection's own |
+| `packages/stingers` | Stingers, a formation shooter of the collection's own |
 
 They share `packages/shared`: the shell (the canvas, the bar, the dialogs, the scores, the sound and the loop), the keys and the touch pad, the pixel font and the scores file, `~/.splash/scores.json`, all bundled in front of each game's script when the collection is packed.
 
@@ -24,6 +26,10 @@ builds `dist/`, with the games and `shared/` beside them, using the packing tool
 Space Invaders: arrows or A and D move, Space or X fires, P or Escape pauses, Enter starts. Each wave starts lower and marches faster as its numbers fall; a saucer now and then is worth 50 to 300; a fourth cannon comes at 1,500 points.
 
 Asteroids: arrows or A and D turn, the up arrow or W thrusts, Space or X fires, the down arrow, S, Z or Shift is hyperspace, P or Escape pauses, Enter starts. Rocks break in two until they are dust; the big saucer is worth 200 and the small one, which aims, 1,000; a new ship every 10,000 points.
+
+Pantry Raid: the arrows or W, A, S and D turn the mouse, which keeps running until a wall stops it; P or Escape pauses, Enter starts. The mouse eats every crumb while four cats hunt it, each in its own way. A bell scares the cats for a few seconds, and a cat caught while it runs goes back to its corner for 150 points, then 300, 450 and 600. Cheese appears once half the crumbs are gone. Every level has a maze of its own, made from the level's number, and faster cats; a new mouse comes every 5,000 points.
+
+Stingers: arrows or A and D move, Space or X fires two shots at a time, P or Escape pauses, Enter starts. The wasps fly in by squads and settle into ranks, then dive at the ship one at a time, shooting as they come. Drones are worth 10, soldiers 20 and queens 50, and double when shot in a dive. A queen takes two hits and drops honey, which gives eight seconds of rapid fire; a new ship comes every 4,000 points.
 
 ## Licence
 
