@@ -2,6 +2,7 @@
 
      node tools/test-pantry-maze.js
 
+   The pantries are drawn by hand and the levels go round them in turn.
    Every level from 1 to 99 has a maze that is the same each time it is
    made, mirrored left to right, walled all round, with every open tile
    reachable from the mouse's start, no dead ends, and the start, the
@@ -18,13 +19,14 @@ const P = window.splash.pantry, COLS = P.cols, ROWS = P.rows;
 let failures = 0;
 function log(name, ok, detail) { console.log((ok ? 'PASS ' : 'FAIL ') + name + (ok ? '' : '  ' + String(detail || '').slice(0, 400))); if (!ok) { failures++; } }
 
-const bad = { same: [], mirror: [], border: [], reach: [], dead: [], places: [] };
+const bad = { same: [], turn: [], mirror: [], border: [], reach: [], dead: [], places: [] };
 let fewest = Infinity, most = 0;
 const pictures = new Set();
 for (let level = 1; level <= 99; level++) {
     const m = P.maze(level), again = P.maze(level);
     const open = (x, y) => m.open[y * COLS + x] === 1;
     if (m.open.join('') !== again.open.join('')) { bad.same.push(level); }
+    if (m.open.join('') !== P.maze(level + P.pantries).open.join('')) { bad.turn.push(level); }
     pictures.add(m.open.join(''));
     let count = 0;
     for (let y = 0; y < ROWS; y++) {
@@ -50,7 +52,12 @@ for (let level = 1; level <= 99; level++) {
     fewest = Math.min(fewest, count); most = Math.max(most, count);
 }
 log('a level\'s maze is the same every time', !bad.same.length, bad.same);
-log('the levels have mazes of their own', pictures.size === 99, pictures.size);
+log('the pantries are all different', P.pantries >= 3 && pictures.size === P.pantries, pictures.size + ' of ' + P.pantries);
+log('the levels go round the pantries in turn', !bad.turn.length, bad.turn);
+log('the mouse starts in the middle and the bells hang halfway along the walls',
+    P.start.x === (COLS - 1) / 2 && P.start.y === (ROWS - 1) / 2 &&
+    P.bells.map(b => b.x + ',' + b.y).sort().join(' ') === ['1,' + P.start.y, (COLS - 2) + ',' + P.start.y, P.start.x + ',1', P.start.x + ',' + (ROWS - 2)].sort().join(' '),
+    JSON.stringify(P.bells));
 log('every maze is mirrored left to right', !bad.mirror.length, [...new Set(bad.mirror)]);
 log('every maze is walled all round', !bad.border.length, [...new Set(bad.border)]);
 log('every open tile is reached from the start', !bad.reach.length, bad.reach);
